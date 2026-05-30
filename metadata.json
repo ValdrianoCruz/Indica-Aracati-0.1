@@ -1,0 +1,6 @@
+{
+  "name": "Indica Aracati",
+  "description": "Lista de profissionais recomendados em Aracati, Ceará. Simples, rápido e otimizado para idosos.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
