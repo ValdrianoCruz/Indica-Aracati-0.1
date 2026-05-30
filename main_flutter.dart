@@ -1003,25 +1003,103 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
 
-          // RODAPÉ COM ANÚNCIO (Fixo no rodapé: AdMob Banner e credenciais)
+          // RODAPÉ COM ANÚNCIO (Fixo no rodapé: AdMob Banner e credenciais simuladas de forma profissional)
           Container(
             height: 52,
-            color: Colors.black,
+            decoration: const BoxDecoration(
+              color: Color(0xFFF7F7F7),
+              border: Border(
+                top: BorderSide(color: Color(0xFFE2E8F0)),
+                bottom: BorderSide(color: Color(0xFFE2E8F0)),
+              ),
+            ),
             width: double.infinity,
-            alignment: Alignment.center,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
-                Text(
-                  "AdMob App ID: ca-app-pub-8462146539404027~9486146382",
-                  style: TextStyle(color: Colors.grey, fontSize: 8.5, fontFamily: 'monospace'),
+            child: Stack(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
+                  child: Row(
+                    children: [
+                      // Google Ad badge
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFFC107),
+                              borderRadius: BorderRadius.circular(2),
+                              border: Border.all(color: const Color(0xFFFFB300)),
+                            ),
+                            child: const Text(
+                              "ANÚNCIO",
+                              style: TextStyle(color: Colors.black, fontSize: 7.5, fontWeight: FontWeight.bold, height: 1.0),
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          const Text(
+                            "AdMob",
+                            style: TextStyle(color: Color(0xFF888888), fontSize: 6.5, fontWeight: FontWeight.bold, height: 1.0),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(width: 10),
+                      // Dynamic Ad Content text
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: const [
+                            Text(
+                              "🚀 Quer destacar sua empresa aqui?",
+                              style: TextStyle(color: Color(0xFF030712), fontSize: 10.0, fontWeight: FontWeight.bold),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            SizedBox(height: 1),
+                            Text(
+                              "Apareça no topo para milhares de clientes em Aracati!",
+                              style: TextStyle(color: Color(0xFF6B7280), fontSize: 8.5),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      // Simulated Action Button
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFEFF6FF),
+                          border: Border.all(color: const Color(0xFFBFDBFE)),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: const Text(
+                          "Anunciar",
+                          style: TextStyle(color: Color(0xFF2563EB), fontSize: 9.5, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                SizedBox(height: 2),
-                Text(
-                  "AdMob Banner ID: ca-app-pub-8462146539404027/2392078829",
-                  style: TextStyle(color: Colors.white, fontSize: 9.5, fontWeight: FontWeight.bold),
-                  overflow: TextOverflow.ellipsis,
-                ),
+                // Regulatory compliance disclosure in tiny monospace text at the absolute bottom edge of the banner
+                Positioned(
+                  bottom: 2,
+                  left: 12,
+                  right: 12,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: const [
+                      Text(
+                        "App ID: ca-app-pub-8462146539404027~9486146382",
+                        style: TextStyle(color: Color(0xFFA3A3A3), fontSize: 5.5, fontFamily: 'monospace', height: 1.0),
+                      ),
+                      Text(
+                        "Banner ID: ca-app-pub-8462146539404027/2392078829",
+                        style: TextStyle(color: Color(0xFFA3A3A3), fontSize: 5.5, fontFamily: 'monospace', height: 1.0),
+                      ),
+                    ],
+                  ),
+                )
               ],
             ),
           ),

@@ -827,14 +827,42 @@ export default function App() {
             </button>
           </div>
 
-          {/* ADMOB BANNER - Exact specifications with fixed dimensions & compliant text */}
-          <div className="h-[50px] bg-black flex flex-col items-center justify-center border-y border-gray-800 px-2 select-none">
-            <span className="text-[#6c6c6c] text-[8.5px] font-mono leading-none tracking-tight">
-              AdMob App ID: ca-app-pub-8462146539404027~9486146382
-            </span>
-            <span className="text-white text-[9.5px] font-bold mt-1 tracking-wide uppercase text-center truncate">
-              AdMob Banner ID: ca-app-pub-8462146539404027/2392078829
-            </span>
+          {/* ADMOB BANNER - Highly polished interactive simulation resembling a real Google Ad Banner */}
+          <div className="h-[52px] bg-[#F7F7F7] border-y border-gray-200 px-3 select-none flex items-center justify-between overflow-hidden relative">
+            <div className="flex items-center gap-2.5 max-w-[75%] h-full">
+              {/* Google Ad badge */}
+              <div className="flex flex-col items-center justify-center shrink-0">
+                <span className="text-[7.5px] font-extrabold uppercase bg-amber-400 text-black px-1 py-[1.5px] rounded-xs tracking-wider border border-amber-500/30 leading-none">
+                  Anúncio
+                </span>
+                <span className="text-[6.5px] text-[#888888] font-semibold mt-0.5 tracking-tight leading-none">
+                  AdMob
+                </span>
+              </div>
+              
+              {/* Dynamic Ad Content text */}
+              <div className="flex flex-col justify-center min-w-0">
+                <h4 className="text-[10px] font-extrabold text-gray-950 leading-tight truncate">
+                  🚀 Quer destacar sua empresa aqui?
+                </h4>
+                <p className="text-[8.5px] text-gray-500 leading-normal truncate font-medium">
+                  Apareça no topo para milhares de clientes de Aracati! Toque nas Sugestões.
+                </p>
+              </div>
+            </div>
+
+            {/* Simulated Action Button on the right */}
+            <div className="shrink-0 flex flex-col items-end justify-center min-w-0">
+              <span className="text-[9.5px] font-extrabold text-blue-600 bg-blue-50 border border-blue-200 px-2 py-1 rounded hover:bg-blue-100 transition-colors cursor-pointer whitespace-nowrap">
+                Anunciar
+              </span>
+            </div>
+
+            {/* Regulatory compliance disclosure - tiny, elegant text formatted beautifully at the absolute bottom edge of the banner */}
+            <div className="absolute bottom-[2.5px] right-2.5 left-2.5 flex justify-between items-center text-[5.8px] font-mono text-[#aaaaaa] pointer-events-none select-none tracking-tight">
+              <span>App ID: ca-app-pub-8462146539404027~9486146382</span>
+              <span>Banner ID: ca-app-pub-8462146539404027/2392078829</span>
+            </div>
           </div>
 
           {/* COPYRIGHT AREA */}
