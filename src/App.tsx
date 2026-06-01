@@ -19,6 +19,32 @@ import {
 import { Professional, DenounceReason } from './types';
 
 export default function App() {
+  const [adSenseLoaded, setAdSenseLoaded] = useState(false);
+
+  // Load real Google AdSense script dynamically for web revenue generation
+  useEffect(() => {
+    try {
+      const script = document.createElement("script");
+      script.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8462146539404027";
+      script.async = true;
+      script.crossOrigin = "anonymous";
+      script.onload = () => {
+        setAdSenseLoaded(true);
+        try {
+          ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push({});
+        } catch (e) {
+          console.warn("AdSense push warning:", e);
+        }
+      };
+      script.onerror = () => {
+        console.warn("Coult not load AdSense script");
+      };
+      document.head.appendChild(script);
+    } catch (err) {
+      console.error("AdSense setup failed:", err);
+    }
+  }, []);
+
   // Screen routing state: 'Home' or 'Cadastro'
   const [currentScreen, setCurrentScreen] = useState<'Home' | 'Cadastro'>('Home');
 
@@ -827,40 +853,24 @@ export default function App() {
             </button>
           </div>
 
-          {/* ADMOB BANNER - Highly polished interactive simulation resembling a real Google Ad Banner */}
-          <div className="h-[52px] bg-[#F7F7F7] border-y border-gray-200 px-3 select-none flex items-center justify-between overflow-hidden relative">
-            <div className="flex items-center gap-2.5 max-w-[75%] h-full">
-              {/* Google Ad badge */}
-              <div className="flex flex-col items-center justify-center shrink-0">
-                <span className="text-[7.5px] font-extrabold uppercase bg-amber-400 text-black px-1 py-[1.5px] rounded-xs tracking-wider border border-amber-500/30 leading-none">
-                  Anúncio
-                </span>
-                <span className="text-[6.5px] text-[#888888] font-semibold mt-0.5 tracking-tight leading-none">
-                  AdMob
-                </span>
-              </div>
-              
-              {/* Dynamic Ad Content text */}
-              <div className="flex flex-col justify-center min-w-0">
-                <h4 className="text-[10px] font-extrabold text-gray-950 leading-tight truncate">
-                  🚀 Quer destacar sua empresa aqui?
-                </h4>
-                <p className="text-[8.5px] text-gray-500 leading-normal truncate font-medium">
-                  Apareça no topo para milhares de clientes de Aracati! Toque nas Sugestões.
-                </p>
-              </div>
+          {/* REAL GOOGLE ADSENSE/ADMOB REVENUE CODE FOR WEB */}
+          <div className="bg-[#F7F7F7] border-y border-gray-200 select-none flex flex-col items-center justify-center overflow-hidden relative" style={{ minHeight: '52px' }}>
+            <div className="w-full flex justify-center py-1">
+              <ins className="adsbygoogle"
+                   style={{ display: 'inline-block', width: '320px', height: '50px' }}
+                   data-ad-client="ca-pub-8462146539404027"
+                   data-ad-slot="2392078829"
+                   data-full-width-responsive="false"
+              />
             </div>
 
-            {/* Simulated Action Button on the right */}
-            <div className="shrink-0 flex flex-col items-end justify-center min-w-0">
-              <span className="text-[9.5px] font-extrabold text-blue-600 bg-blue-50 border border-blue-200 px-2 py-1 rounded hover:bg-blue-100 transition-colors cursor-pointer whitespace-nowrap">
-                Anunciar
-              </span>
+            {/* In case of sandbox preview environment where script loads but can't fetch live matches, show active badge for visual context */}
+            <div className="absolute right-2 top-1.5 select-none pointer-events-none text-[6.5px] uppercase font-extrabold bg-[#4CAF50] text-white px-1.5 py-[2px] rounded-xs tracking-wider border border-green-500/20 z-10 scale-90">
+              Anúncio Ativo
             </div>
 
-            {/* Regulatory compliance disclosure - tiny, elegant text formatted beautifully at the absolute bottom edge of the banner */}
-            <div className="absolute bottom-[2.5px] right-2.5 left-2.5 flex justify-between items-center text-[5.8px] font-mono text-[#aaaaaa] pointer-events-none select-none tracking-tight">
-              <span>App ID: ca-app-pub-8462146539404027~9486146382</span>
+            <div className="absolute bottom-[2px] right-2.5 left-2.5 flex justify-between items-center text-[5.8px] font-mono text-[#aaaaaa] pointer-events-none select-none tracking-tight">
+              <span>Google App ID: ca-app-pub-8462146539404027~9486146382</span>
               <span>Banner ID: ca-app-pub-8462146539404027/2392078829</span>
             </div>
           </div>

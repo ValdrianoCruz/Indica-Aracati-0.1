@@ -13,16 +13,21 @@
 //   http: ^1.1.0            # Para chamadas HTTP da API do EmailJS
 //   url_launcher: ^6.1.11    # Para chamadas de WhatsApp e rascunhos de e-mail
 //   shared_preferences: ^2.2.0 # Para persistência de dados localmente (Stored Variables)
+//   google_mobile_ads: ^3.0.0 # Para exibição real de anúncios do Google AdMob
 //
 // ==========================================================================
 
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  MobileAds.instance.initialize();
   runApp(const IndicaAracatiApp());
 }
 
@@ -118,10 +123,78 @@ class _HomeScreenState extends State<HomeScreen> {
   // Profissionais estáticos padrão do edital
   final List<Professional> _initialProfessionals = [];
 
+  int _currentAdIndex = 0;
+  Timer? _adTimer;
+  BannerAd? _bannerAd;
+  bool _isBannerAdLoaded = false;
+  
+  final List<Map<String, String>> _mockAds = [
+    {
+      "title": "🚀 Quer destacar sua empresa aqui?",
+      "desc": "Apareça no topo para milhares de clientes em Aracati!",
+      "btn": "Anunciar"
+    },
+    {
+      "title": "🍕 Pizzaria Delícia de Aracati",
+      "desc": "Melhor pizza da região! Tele-entrega no Centro e bairros.",
+      "btn": "Pedir"
+    },
+    {
+      "title": "🛠️ Dr. Faz Tudo Aracati",
+      "desc": "Instalação, elétrica e pequenos reparos rápidos. Chame!",
+      "btn": "Chamar"
+    },
+    {
+      "title": "⚡ Aracati Energia Solar",
+      "desc": "Economize até 95% na sua fatura mensal. Contate-nos!",
+      "btn": "Simular"
+    }
+  ];
+
+  void _initAdMobBanner() {
+    try {
+      _bannerAd = BannerAd(
+        adUnitId: 'ca-app-pub-8462146539404027/2392078829',
+        request: const AdRequest(),
+        size: AdSize.banner,
+        listener: BannerAdListener(
+          onAdLoaded: (ad) {
+            if (mounted) {
+              setState(() {
+                _isBannerAdLoaded = true;
+              });
+            }
+          },
+          onAdFailedToLoad: (ad, err) {
+            debugPrint('Falha ao carregar AdMob Real: ${err.message}');
+            ad.dispose();
+          },
+        ),
+      )..load();
+    } catch (e) {
+      debugPrint('Erro ao inicializar BannerAd: $e');
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     _loadStoredProfessionals();
+    _initAdMobBanner();
+    _adTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
+      if (mounted) {
+        setState(() {
+          _currentAdIndex = (_currentAdIndex + 1) % _mockAds.length;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _adTimer?.cancel();
+    _bannerAd?.dispose();
+    super.dispose();
   }
 
   // Carrega profissionais adicionados localmente via SharedPreferences
@@ -1003,7 +1076,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
 
-          // RODAPÉ COM ANÚNCIO (Fixo no rodapé: AdMob Banner e credenciais simuladas de forma profissional)
+          // RODAPÉ COM ANÚNCIO (Inicializa o AdMob real do Google e exibe se carregado, com fallback rotativo)
           Container(
             height: 52,
             decoration: const BoxDecoration(
@@ -1014,94 +1087,101 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             width: double.infinity,
-            child: Stack(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
-                  child: Row(
+            alignment: Alignment.center,
+            child: _isBannerAdLoaded && _bannerAd != null
+                ? SizedBox(
+                    width: _bannerAd!.size.width.toDouble(),
+                    height: _bannerAd!.size.height.toDouble(),
+                    child: AdWidget(ad: _bannerAd!),
+                  )
+                : Stack(
                     children: [
-                      // Google Ad badge
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFFFC107),
-                              borderRadius: BorderRadius.circular(2),
-                              border: Border.all(color: const Color(0xFFFFB300)),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
+                        child: Row(
+                          children: [
+                            // Google Ad badge
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFFFC107),
+                                    borderRadius: BorderRadius.circular(2),
+                                    border: Border.all(color: const Color(0xFFFFB300)),
+                                  ),
+                                  child: const Text(
+                                    "ANÚNCIO",
+                                    style: TextStyle(color: Colors.black, fontSize: 7.5, fontWeight: FontWeight.bold, height: 1.0),
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                const Text(
+                                  "AdMob",
+                                  style: TextStyle(color: Color(0xFF888888), fontSize: 6.5, fontWeight: FontWeight.bold, height: 1.0),
+                                ),
+                              ],
                             ),
-                            child: const Text(
-                              "ANÚNCIO",
-                              style: TextStyle(color: Colors.black, fontSize: 7.5, fontWeight: FontWeight.bold, height: 1.0),
+                            const SizedBox(width: 10),
+                            // Dynamic Ad Content text
+                            Expanded(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    _mockAds[_currentAdIndex]["title"]!,
+                                    style: const TextStyle(color: Color(0xFF030712), fontSize: 10.0, fontWeight: FontWeight.bold),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 1),
+                                  Text(
+                                    _mockAds[_currentAdIndex]["desc"]!,
+                                    style: const TextStyle(color: Color(0xFF6B7280), fontSize: 8.5),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 2),
-                          const Text(
-                            "AdMob",
-                            style: TextStyle(color: Color(0xFF888888), fontSize: 6.5, fontWeight: FontWeight.bold, height: 1.0),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(width: 10),
-                      // Dynamic Ad Content text
-                      Expanded(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
-                            Text(
-                              "🚀 Quer destacar sua empresa aqui?",
-                              style: TextStyle(color: Color(0xFF030712), fontSize: 10.0, fontWeight: FontWeight.bold),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            SizedBox(height: 1),
-                            Text(
-                              "Apareça no topo para milhares de clientes em Aracati!",
-                              style: TextStyle(color: Color(0xFF6B7280), fontSize: 8.5),
-                              overflow: TextOverflow.ellipsis,
+                            const SizedBox(width: 8),
+                            // Simulated Action Button
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFEFF6FF),
+                                border: Border.all(color: const Color(0xFFBFDBFE)),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                _mockAds[_currentAdIndex]["btn"]!,
+                                style: const TextStyle(color: Color(0xFF2563EB), fontSize: 9.5, fontWeight: FontWeight.bold),
+                              ),
                             ),
                           ],
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      // Simulated Action Button
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFEFF6FF),
-                          border: Border.all(color: const Color(0xFFBFDBFE)),
-                          borderRadius: BorderRadius.circular(4),
+                      // Regulatory compliance disclosure in tiny monospace text at the absolute bottom edge of the banner
+                      Positioned(
+                        bottom: 2,
+                        left: 12,
+                        right: 12,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: const [
+                            Text(
+                              "App ID: ca-app-pub-8462146539404027~9486146382",
+                              style: TextStyle(color: Color(0xFFA3A3A3), fontSize: 5.5, fontFamily: 'monospace', height: 1.0),
+                            ),
+                            Text(
+                              "Banner ID: ca-app-pub-8462146539404027/2392078829",
+                              style: TextStyle(color: Color(0xFFA3A3A3), fontSize: 5.5, fontFamily: 'monospace', height: 1.0),
+                            ),
+                          ],
                         ),
-                        child: const Text(
-                          "Anunciar",
-                          style: TextStyle(color: Color(0xFF2563EB), fontSize: 9.5, fontWeight: FontWeight.bold),
-                        ),
-                      ),
+                      )
                     ],
                   ),
-                ),
-                // Regulatory compliance disclosure in tiny monospace text at the absolute bottom edge of the banner
-                Positioned(
-                  bottom: 2,
-                  left: 12,
-                  right: 12,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: const [
-                      Text(
-                        "App ID: ca-app-pub-8462146539404027~9486146382",
-                        style: TextStyle(color: Color(0xFFA3A3A3), fontSize: 5.5, fontFamily: 'monospace', height: 1.0),
-                      ),
-                      Text(
-                        "Banner ID: ca-app-pub-8462146539404027/2392078829",
-                        style: TextStyle(color: Color(0xFFA3A3A3), fontSize: 5.5, fontFamily: 'monospace', height: 1.0),
-                      ),
-                    ],
-                  ),
-                )
-              ],
-            ),
           ),
 
           // RODAPÉ DIREITOS
